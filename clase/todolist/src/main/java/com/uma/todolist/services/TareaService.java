@@ -16,16 +16,16 @@ public class TareaService {
         return listaDeTareas.stream().map(TareaDTO::new).toList();
     }
 
-    public TareaDTO getByID(long id){
+    public TareaDTO getByID(Long id){
         return listaDeTareas.stream()
-                .filter((Tarea t) -> t.getId() == id)
+                .filter((Tarea t) -> t.getId().equals(id))
                 .map(TareaDTO::new).findFirst().orElse(null);
     }
 
     public List<TareaDTO> filtrar(String titulo){
         return listaDeTareas.stream()
                 .filter((Tarea t) -> (t.getTitulo().toLowerCase().contains(titulo.toLowerCase())))
-                .map((TareaDTO::new)).toList();
+                .map(TareaDTO::new).toList();
     }
 
     public TareaDTO crear (String titulo) {
@@ -34,8 +34,8 @@ public class TareaService {
         return new TareaDTO(nueva);
     }
 
-    public TareaDTO completar (long id){
-        Tarea completed = listaDeTareas.stream().filter((Tarea t) -> t.getId() == id).findFirst().orElse(null);
+    public TareaDTO completar (Long id){
+        Tarea completed = listaDeTareas.stream().filter((Tarea t) -> t.getId().equals(id)).findFirst().orElse(null);
         TareaDTO result;
         if (completed != null){
             completed.setCompletada(true);
@@ -46,7 +46,7 @@ public class TareaService {
         return result;
     }
 
-    public boolean delete (long id){
-        return listaDeTareas.removeIf((Tarea t) -> t.getId() == id);
+    public boolean delete (Long id){
+        return listaDeTareas.removeIf((Tarea t) -> t.getId().equals(id));
     }
 }

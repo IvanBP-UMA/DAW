@@ -1,13 +1,15 @@
 package com.uma.todolist.DTO;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.uma.todolist.models.Tarea;
 
 public class TareaDTO {
-    private long id;
+    private Long id;
     private String titulo;
     private boolean completada;
 
-    public TareaDTO(long id, String titulo, boolean completada) {
+    @JsonCreator
+    public TareaDTO(Long id, String titulo, boolean completada) {
         this.id = id;
         this.titulo = titulo;
         this.completada = completada;
@@ -19,11 +21,11 @@ public class TareaDTO {
         this.completada = t.isCompletada();
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

@@ -29,17 +29,17 @@ public class TareaController {
     }
 
     @GetMapping("/{id}")
-    public TareaDTO getByID(@PathVariable long id){
+    public TareaDTO getByID(@PathVariable Long id){
         return tareaService.getByID(id);
     }
 
     @PutMapping("/{id}")
-    public TareaDTO completar(@PathVariable long id){
+    public TareaDTO completar(@PathVariable Long id){
         return tareaService.completar(id);
     }
 
     @DeleteMapping("/{id}")
-    public boolean delete(@PathVariable long id){
+    public boolean delete(@PathVariable Long id){
         return tareaService.delete(id);
     }
 }

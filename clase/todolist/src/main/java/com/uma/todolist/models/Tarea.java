@@ -1,7 +1,7 @@
 package com.uma.todolist.models;
 
 public class Tarea {
-    private long id;
+    private Long id;
     private String titulo;
     private boolean completada;
     private String prioridad;
@@ -13,11 +13,11 @@ public class Tarea {
         this.prioridad = prioridad;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
