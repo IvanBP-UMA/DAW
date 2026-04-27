@@ -1,6 +1,14 @@
 package com.uma.todolist.models;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "tareas")
 public class Tarea {
+    @Id @GeneratedValue
     private Long id;
     private String titulo;
     private boolean completada;

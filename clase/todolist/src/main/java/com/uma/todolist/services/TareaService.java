@@ -2,24 +2,24 @@ package com.uma.todolist.services;
 
 import com.uma.todolist.DTO.TareaDTO;
 import com.uma.todolist.models.Tarea;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import repositories.TareaRepository;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class TareaService {
-    private List<Tarea> listaDeTareas = new ArrayList<>();
-    private long idCounter = 1L;
+    @Autowired
+    private TareaRepository tareaRepository;
 
     public List<TareaDTO> listarTodos(){
-        return listaDeTareas.stream().map(TareaDTO::new).toList();
+        return tareaRepository.findAll().stream().map(TareaDTO::new).toList();
     }
 
     public TareaDTO getByID(Long id){
-        return listaDeTareas.stream()
-                .filter((Tarea t) -> t.getId().equals(id))
-                .map(TareaDTO::new).findFirst().orElse(null);
+        return tareaRepository.
     }
 
     public List<TareaDTO> filtrar(String titulo){
