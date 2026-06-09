@@ -1,0 +1,6 @@
+-------------------------------------------------------------------------------
+Test set: es.uma.informatica.daw.tutorialtesting.AplicacionTests$ListaConDatos
+-------------------------------------------------------------------------------
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 11.39 s -- in es.uma.informatica.daw.tutorialtesting.AplicacionTests$ListaConDatos
+es.uma.informatica.daw.tutorialtesting.AplicacionTests$ListaConDatos.modificaProyectoCorrectamente -- Time elapsed: 1.807 s
+es.uma.informatica.daw.tutorialtesting.AplicacionTests$ListaConDatos.eliminaProyectoCorrectamente -- Time elapsed: 0.074 s

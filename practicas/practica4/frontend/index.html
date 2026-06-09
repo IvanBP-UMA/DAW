@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Tareas - ToDo List</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-gray-100 min-h-screen font-sans">
+
+    <div class="max-w-4xl mx-auto p-6">
+        <header class="flex justify-between items-center bg-white p-6 rounded-lg shadow-sm mb-6">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">📋 Panel de Tareas</h1>
+                <p class="text-sm text-gray-500">Conectado a tu API de Spring Boot</p>
+            </div>
+        </header>
+
+        <div id="alertBox" class="hidden p-4 mb-4 rounded-lg text-sm font-medium transition-all duration-300"></div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            
+            <div class="bg-white p-6 rounded-lg shadow-sm border-t-4 border-indigo-500">
+                <h2 class="text-lg font-semibold text-gray-700 mb-4">Nueva Tarea</h2>
+                <form id="createForm" onsubmit="crearTarea(event)" class="flex gap-2">
+                    <input type="text" id="newTitle" placeholder="Ej. Estudiar para el examen..." required
+                        class="flex-1 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-indigo-500">
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-4 py-2 rounded-lg text-sm transition-colors cursor-pointer">
+                        Añadir
+                    </button>
+                </form>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-sm border-t-4 border-emerald-500">
+                <h2 class="text-lg font-semibold text-gray-700 mb-4">Filtrar por Título</h2>
+                <div class="flex gap-2">
+                    <input type="text" id="searchTitle" placeholder="Escribe para buscar..." 
+                        class="flex-1 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-emerald-500"
+                        oninput="buscarTareas()">
+                    <button onclick="cargarTareas()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium px-4 py-2 rounded-lg text-sm transition-colors cursor-pointer">
+                        Limpiar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <main class="bg-white rounded-lg shadow-sm p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Listado de Tareas</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-gray-200 text-gray-400 text-xs uppercase font-semibold">
+                            <th class="py-3 px-4">ID</th>
+                            <th class="py-3 px-4">Tarea</th>
+                            <th class="py-3 px-4">Estado</th>
+                            <th class="py-3 px-4 text-right">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tareasTableBody" class="divide-y divide-gray-100 text-sm text-gray-700">
+                        <tr>
+                            <td colspan="4" class="text-center py-8 text-gray-400">Conectando con el servidor...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api/tareas';
+
+        // 1. OBTENER TODAS LAS TAREAS (GET)
+        async function cargarTareas() {
+            document.getElementById('searchTitle').value = ""; 
+            try {
+                const res = await fetch(API_URL);
+                if (!res.ok) throw new Error("Error en la petición");
+                const tareas = await res.json();
+                renderTareas(tareas);
+            } catch (err) {
+                showAlert('No se pudo conectar con el backend de Spring Boot. Asegúrate de que esté corriendo y tenga @CrossOrigin.', 'error');
+            }
+        }
+
+        // 2. BUSCAR TAREAS POR TÍTULO (GET /buscar)
+        async function buscarTareas() {
+            const titulo = document.getElementById('searchTitle').value;
+            try {
+                const res = await fetch(`${API_URL}/buscar?titulo=${encodeURIComponent(titulo)}`);
+                if (res.ok) {
+                    const tareas = await res.json();
+                    renderTareas(tareas);
+                }
+            } catch (err) {
+                console.error("Error al buscar tareas:", err);
+            }
+        }
+
+        // 3. AÑADIR NUEVA TAREA (POST)
+        async function crearTarea(event) {
+            event.preventDefault();
+            const input = document.getElementById('newTitle');
+            const titulo = input.value.trim();
+
+            try {
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    // Enviamos "completada" en false para evitar el "Cannot map null into type boolean" de Jackson
+                    body: JSON.stringify({ 
+                        titulo: titulo,
+                        completada: false 
+                    }) 
+                });
+
+                if (res.status === 201 || res.ok) {
+                    showAlert('¡Tarea añadida con éxito!', 'success');
+                    input.value = '';
+                    cargarTareas();
+                } else if (res.status === 400) {
+                    showAlert('El servidor rechazó el envío (título vacío o error de DTO).', 'error');
+                }
+            } catch (err) {
+                showAlert('Error al procesar la creación de la tarea.', 'error');
+            }
+        }
+
+        // 4. MARCAR COMO COMPLETADA (PUT)
+        async function completarTarea(id) {
+            try {
+                const res = await fetch(`${API_URL}/${id}`, {
+                    method: 'PUT'
+                });
+
+                if (res.ok) {
+                    showAlert(`Tarea #${id} completada.`, 'success');
+                    cargarTareas();
+                } else if (res.status === 404) {
+                    showAlert('La tarea no existe en el servidor.', 'error');
+                }
+            } catch (err) {
+                console.error("Error al actualizar:", err);
+            }
+        }
+
+        // 5. ELIMINAR TAREA (DELETE)
+        async function eliminarTarea(id) {
+            if (!confirm('¿Seguro que quieres borrar esta tarea?')) return;
+
+            try {
+                const res = await fetch(`${API_URL}/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (res.status === 204 || res.ok) {
+                    showAlert(`Tarea #${id} eliminada.`, 'success');
+                    cargarTareas();
+                }
+            } catch (err) {
+                console.error("Error al eliminar:", err);
+            }
+        }
+
+        // PINTAR LOS DATOS DINÁMICAMENTE
+        function renderTareas(tareas) {
+            const tbody = document.getElementById('tareasTableBody');
+            tbody.innerHTML = '';
+
+            if (tareas.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center py-8 text-gray-400">No hay tareas que mostrar.</td></tr>`;
+                return;
+            }
+
+            tareas.forEach(tarea => {
+                const completada = tarea.completada || false; 
+
+                const row = document.createElement('tr');
+                row.className = "hover:bg-gray-50 transition-colors";
+                row.innerHTML = `
+                    <td class="py-4 px-4 font-mono text-xs text-gray-400">#${tarea.id}</td>
+                    <td class="py-4 px-4 ${completada ? 'line-through text-gray-400' : 'text-gray-800 font-medium'}">
+                        ${tarea.titulo}
+                    </td>
+                    <td class="py-4 px-4">
+                        <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${completada ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'}">
+                            ${completada ? 'Completada' : 'Pendiente'}
+                        </span>
+                    </td>
+                    <td class="py-4 px-4 text-right flex justify-end gap-2">
+                        ${!completada ? `
+                            <button onclick="completarTarea(${tarea.id})" class="text-xs font-semibold bg-green-50 text-green-700 hover:bg-green-100 py-1 px-3 rounded border border-green-200 transition-colors cursor-pointer">
+                                Completar
+                            </button>
+                        ` : ''}
+                        <button onclick="eliminarTarea(${tarea.id})" class="text-xs font-semibold bg-red-50 text-red-600 hover:bg-red-100 py-1 px-3 rounded border border-red-200 transition-colors cursor-pointer">
+                            Eliminar
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // MOSTRAR ALERTAS VISUALES
+        function showAlert(message, type) {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.innerText = message;
+            alertBox.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'border-green-200', 'bg-red-100', 'text-red-800', 'border-red-200');
+            
+            if (type === 'success') {
+                alertBox.classList.add('bg-green-100', 'text-green-800', 'border', 'border-green-200');
+            } else {
+                alertBox.classList.add('bg-red-100', 'text-red-800', 'border', 'border-red-200');
+            }
+            
+            setTimeout(() => { alertBox.classList.add('hidden'); }, 3500);
+        }
+
+        // CARGA INICIAL
+        window.onload = cargarTareas;
+    </script>
+</body>
+</html>

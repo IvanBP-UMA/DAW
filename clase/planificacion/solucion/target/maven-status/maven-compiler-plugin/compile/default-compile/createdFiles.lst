@@ -1,0 +1,8 @@
+es/uma/informatica/daw/tutorialtesting/entidades/Proyecto.class
+es/uma/informatica/daw/tutorialtesting/repositorios/GlobalExceptionHandler.class
+es/uma/informatica/daw/tutorialtesting/dto/ProyectoDTO.class
+es/uma/informatica/daw/tutorialtesting/Aplicacion.class
+es/uma/informatica/daw/tutorialtesting/repositorios/ProyectoRepo.class
+es/uma/informatica/daw/tutorialtesting/controladores/ControladorProyectos.class
+es/uma/informatica/daw/tutorialtesting/excepciones/ProyectoNoEncontrado.class
+es/uma/informatica/daw/tutorialtesting/servicios/LogicaProyectos.class

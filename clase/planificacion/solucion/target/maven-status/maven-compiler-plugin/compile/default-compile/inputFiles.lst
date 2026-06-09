@@ -1,0 +1,8 @@
+/home/ivan/Documents/3o/DAW/clase/planificacion/solucion/src/main/java/es/uma/informatica/daw/tutorialtesting/Aplicacion.java
+/home/ivan/Documents/3o/DAW/clase/planificacion/solucion/src/main/java/es/uma/informatica/daw/tutorialtesting/controladores/ControladorProyectos.java
+/home/ivan/Documents/3o/DAW/clase/planificacion/solucion/src/main/java/es/uma/informatica/daw/tutorialtesting/dto/ProyectoDTO.java
+/home/ivan/Documents/3o/DAW/clase/planificacion/solucion/src/main/java/es/uma/informatica/daw/tutorialtesting/entidades/Proyecto.java
+/home/ivan/Documents/3o/DAW/clase/planificacion/solucion/src/main/java/es/uma/informatica/daw/tutorialtesting/excepciones/ProyectoNoEncontrado.java
+/home/ivan/Documents/3o/DAW/clase/planificacion/solucion/src/main/java/es/uma/informatica/daw/tutorialtesting/repositorios/GlobalExceptionHandler.java
+/home/ivan/Documents/3o/DAW/clase/planificacion/solucion/src/main/java/es/uma/informatica/daw/tutorialtesting/repositorios/ProyectoRepo.java
+/home/ivan/Documents/3o/DAW/clase/planificacion/solucion/src/main/java/es/uma/informatica/daw/tutorialtesting/servicios/LogicaProyectos.java

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ControladorProyectos.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">practica3</a> &gt; <a href="index.source.html" class="el_package">es.uma.informatica.daw.tutorialtesting.controladores</a> &gt; <span class="el_source">ControladorProyectos.java</span></div><h1>ControladorProyectos.java</h1><pre class="source lang-java linenums">package es.uma.informatica.daw.tutorialtesting.controladores;
+
+import java.net.URI;
+import java.util.List;
+
+import es.uma.informatica.daw.tutorialtesting.dto.ProyectoDTO;
+import es.uma.informatica.daw.tutorialtesting.entidades.Proyecto;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import es.uma.informatica.daw.tutorialtesting.servicios.LogicaProyectos;
+
+@RestController
+@RequestMapping(&quot;/api/planificador/proyectos&quot;)
+public class ControladorProyectos {
+	private LogicaProyectos servicio;
+
+<span class="fc" id="L19">	public ControladorProyectos(LogicaProyectos servicioProyectos) {</span>
+<span class="fc" id="L20">		servicio = servicioProyectos;</span>
+<span class="fc" id="L21">	}</span>
+
+	@GetMapping
+	public ResponseEntity&lt;List&lt;ProyectoDTO&gt;&gt; listaDeProyectos() {
+<span class="fc" id="L25">		return ResponseEntity.ok(</span>
+<span class="fc" id="L26">				servicio.getTodosProyectos().stream()</span>
+<span class="fc" id="L27">						.map(ProyectoDTO::fromProyecto) // Transformamos cada entidad en DTO</span>
+<span class="fc" id="L28">						.toList()</span>
+		);
+	}
+
+	@PostMapping
+	public ResponseEntity&lt;ProyectoDTO&gt; anadirProyecto(@RequestBody ProyectoDTO proyectoDTO, UriComponentsBuilder builder) {
+		// 1. Convertimos el DTO que llega del cliente a Entidad para el servicio
+<span class="fc" id="L35">		Proyecto nuevoProyecto = servicio.anadirProyecto(proyectoDTO.toEntity());</span>
+
+		// 2. Construimos la URI del nuevo recurso
+<span class="fc" id="L38">		URI uri = builder</span>
+<span class="fc" id="L39">				.path(&quot;/api/planificador/proyectos/{id}&quot;)</span>
+<span class="fc" id="L40">				.buildAndExpand(nuevoProyecto.getId())</span>
+<span class="fc" id="L41">				.toUri();</span>
+
+		// 3. Devolvemos 201 Created, la cabecera Location y el DTO en el cuerpo
+<span class="fc" id="L44">		return ResponseEntity</span>
+<span class="fc" id="L45">				.created(uri)</span>
+<span class="fc" id="L46">				.body(ProyectoDTO.fromProyecto(nuevoProyecto));</span>
+	}
+
+	@GetMapping(&quot;{id}&quot;)
+	public ResponseEntity&lt;ProyectoDTO&gt; getProyecto(@PathVariable Long id) {
+<span class="fc" id="L51">		return ResponseEntity.of(</span>
+<span class="fc" id="L52">				servicio.getProyectoPorId(id)</span>
+<span class="fc" id="L53">						.map(ProyectoDTO::fromProyecto) // Transformamos el contenido del Optional si existe</span>
+		);
+	}
+
+	@PutMapping(&quot;{id}&quot;)
+	public ResponseEntity&lt;ProyectoDTO&gt; modificarProyecto(@PathVariable Long id, @RequestBody ProyectoDTO proyectoDTO) {
+		// 1. Aseguramos que el ID de la URL sea el que se usa
+<span class="fc" id="L60">		proyectoDTO.setId(id);</span>
+
+		// 2. Llamamos a la capa de servicio
+		// El servicio lanza ProyectoNoEncontrado si no existe,
+		// manejado por nuestro GlobalExceptionHandler (404).
+<span class="fc" id="L65">		servicio.modificarProyecto(proyectoDTO.toEntity());</span>
+
+		// 3. Confirmamos el éxito con 204 No Content
+<span class="fc" id="L68">		return ResponseEntity.noContent().build();</span>
+	}
+
+	@DeleteMapping(&quot;{id}&quot;)
+	public ResponseEntity&lt;?&gt; eliminarProyecto(@PathVariable Long id) {
+		// Si el id no existe, el servicio lanzará ProyectoNoEncontrado
+		// y nuestro GlobalExceptionHandler lo convertirá en un 404.
+<span class="fc" id="L75">		servicio.eliminarProyecto(id);</span>
+
+		// Retornamos 204 (No Content) porque el recurso ha sido eliminado
+		// y no hay nada que devolver en el cuerpo.
+<span class="fc" id="L79">		return ResponseEntity.noContent().build();</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

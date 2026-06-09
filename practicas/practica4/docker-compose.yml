@@ -1,0 +1,40 @@
+services:
+  db:
+    image: "mysql:8.4.0"
+    environment:
+        - MYSQL_ROOT_PASSWORD=rootpassword
+        - MYSQL_DATABASE=tareas
+        - MYSQL_USER=desarrollador
+        - MYSQL_PASSWORD=1234
+    volumes:
+        - "db:/var/lib/mysql"
+    restart: always
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+
+  backend:
+    build: ./backend
+    environment:
+        - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/tareas
+        - SPRING_DATASOURCE_DRIVERCLASSNAME=com.mysql.cj.jdbc.Driver
+        - SPRING_JPA_DATABASE_PLATFORM=org.hibernate.dialect.MySQLDialect
+        - SPRING_DATASOURCE_USERNAME=desarrollador
+        - SPRING_DATASOURCE_PASSWORD=1234
+    ports:
+        - "5000:5000"
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    ports:
+        - "8080:80"
+    restart: always
+        
+volumes:
+    db:
